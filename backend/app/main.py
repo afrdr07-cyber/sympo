@@ -40,16 +40,22 @@ app.include_router(payment.router, prefix=settings.API_V1_STR)
 app.include_router(receipt.router, prefix=settings.API_V1_STR)
 
 @app.get("/")
-async def root():
+@app.get("/api/v1/health")
+@app.get("/api/health")
+@app.get("/health")
+async def root(request: Request = None):
+    req_path = request.url.path if request else "unknown"
     return {
         "status": "online",
         "service": settings.PROJECT_NAME,
         "department": "Artificial Intelligence & Data Science",
         "college": "P.S.V College of Engineering & Technology",
         "version": "1.0.0",
+        "path": req_path,
         "database": "Google Sheets (via Apps Script Web App)",
         "paymentMode": settings.PAYMENT_MODE
     }
+
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
