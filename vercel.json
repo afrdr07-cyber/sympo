@@ -2,14 +2,29 @@
   "buildCommand": "npm run build --prefix frontend",
   "installCommand": "npm install --prefix frontend",
   "outputDirectory": "frontend/dist",
+  "functions": {
+    "api/index.py": {
+      "memory": 1024,
+      "maxDuration": 15
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
       "destination": "/api/index.py"
     },
     {
-      "source": "/(.*)",
+      "source": "/docs",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/openapi.json",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/((?!api/|docs|openapi.json).*)",
       "destination": "/index.html"
     }
   ]
 }
+

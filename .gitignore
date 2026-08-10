@@ -56,3 +56,5 @@ Thumbs.db
 *.zip
 *.rar
 *.7z
+
+.vercel
