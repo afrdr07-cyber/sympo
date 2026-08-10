@@ -2,6 +2,12 @@ import uuid
 from typing import Dict, Any, Optional
 from app.config import settings
 
+try:
+    import cashfree_pg
+except ImportError:
+    cashfree_pg = None
+
+
 class PaymentService:
     """
     Payment Gateway Integration Abstraction Layer.
