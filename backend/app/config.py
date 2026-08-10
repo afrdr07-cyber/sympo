@@ -1,5 +1,5 @@
 import os
-from typing import Optional, Any
+from typing import Optional
 from dotenv import load_dotenv
 
 # Load .env file
@@ -10,7 +10,6 @@ DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbzHsjuh3_OhNxIf0uOAJJ
 
 try:
     from pydantic_settings import BaseSettings, SettingsConfigDict
-    from pydantic import field_validator
 
     class Settings(BaseSettings):
         PROJECT_NAME: str = "AI NEXUS 2026 - P.S.V CET AI & DS Symposium API"
@@ -22,17 +21,15 @@ try:
         ADMIN_USERNAME: str = os.getenv("ADMIN_USERNAME", "admin")
         ADMIN_PASSWORD: str = os.getenv("ADMIN_PASSWORD", "psvaids2026password")
 
-        GOOGLE_APPS_SCRIPT_URL: str = DEFAULT_GAS_URL
-
         PAYMENT_MODE: str = os.getenv("PAYMENT_MODE", "PLACEHOLDER")
         CASHFREE_APP_ID: str = os.getenv("CASHFREE_APP_ID", "placeholder_app_id")
         CASHFREE_SECRET_KEY: str = os.getenv("CASHFREE_SECRET_KEY", "placeholder_secret_key")
         CASHFREE_ENV: str = os.getenv("CASHFREE_ENV", "TEST")
 
-        @field_validator("GOOGLE_APPS_SCRIPT_URL", mode="before")
-        @classmethod
-        def sanitize_gas_url(cls, v: Any) -> str:
-            val = str(v or "").strip()
+        @property
+        def GOOGLE_APPS_SCRIPT_URL(self) -> str:
+            raw = os.getenv("GOOGLE_APPS_SCRIPT_URL")
+            val = str(raw or "").strip()
             if not val or not val.startswith("http") or "YOUR_" in val:
                 return DEFAULT_GAS_URL
             return val
@@ -42,11 +39,6 @@ try:
     settings = Settings()
 
 except Exception as e:
-    raw_gas = os.getenv("GOOGLE_APPS_SCRIPT_URL")
-    gas_val = str(raw_gas or "").strip()
-    if not gas_val or not gas_val.startswith("http") or "YOUR_" in gas_val:
-        gas_val = DEFAULT_GAS_URL
-
     class FallbackSettings:
         PROJECT_NAME: str = os.getenv("PROJECT_NAME", "P.S.V College AI & DS Symposium 2026 API")
         API_V1_STR: str = os.getenv("API_V1_STR", "/api/v1")
@@ -57,13 +49,20 @@ except Exception as e:
         ADMIN_USERNAME: str = os.getenv("ADMIN_USERNAME", "admin")
         ADMIN_PASSWORD: str = os.getenv("ADMIN_PASSWORD", "psvaids2026password")
 
-        GOOGLE_APPS_SCRIPT_URL: str = gas_val
-
         PAYMENT_MODE: str = os.getenv("PAYMENT_MODE", "PLACEHOLDER")
         CASHFREE_APP_ID: str = os.getenv("CASHFREE_APP_ID", "placeholder_app_id")
         CASHFREE_SECRET_KEY: str = os.getenv("CASHFREE_SECRET_KEY", "placeholder_secret_key")
         CASHFREE_ENV: str = os.getenv("CASHFREE_ENV", "TEST")
 
+        @property
+        def GOOGLE_APPS_SCRIPT_URL(self) -> str:
+            raw = os.getenv("GOOGLE_APPS_SCRIPT_URL")
+            val = str(raw or "").strip()
+            if not val or not val.startswith("http") or "YOUR_" in val:
+                return DEFAULT_GAS_URL
+            return val
+
     settings = FallbackSettings()
+
 
 
