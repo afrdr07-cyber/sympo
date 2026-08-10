@@ -7,9 +7,11 @@ env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__
 load_dotenv(env_path)
 
 DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbzHsjuh3_OhNxIf0uOAJJwyU4K5aU8o48GSyOUMymzc80Lpt2zQ-AJ--caAPSHEWLEhYw/exec"
-gas_url_env = os.getenv("GOOGLE_APPS_SCRIPT_URL", "").strip()
+raw_gas = os.getenv("GOOGLE_APPS_SCRIPT_URL")
+gas_url_env = (raw_gas or "").strip()
 if not gas_url_env or not gas_url_env.startswith("http") or "YOUR_" in gas_url_env:
     gas_url_env = DEFAULT_GAS_URL
+
 
 try:
     from pydantic_settings import BaseSettings, SettingsConfigDict
