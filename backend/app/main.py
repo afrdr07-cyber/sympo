@@ -65,3 +65,14 @@ async def global_exception_handler(request: Request, exc: Exception):
         status_code=500,
         content={"success": False, "error": f"Internal Server Error: {str(exc)}"}
     )
+
+@app.api_route("/{catch_all:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+async def catch_all_debug(request: Request, catch_all: str):
+    return {
+        "debug": True,
+        "catch_all": catch_all,
+        "url_path": request.url.path,
+        "scope_path": request.scope.get("path"),
+        "headers": {k.decode("utf-8", "ignore"): v.decode("utf-8", "ignore") for k, v in request.scope.get("headers", [])}
+    }
+
