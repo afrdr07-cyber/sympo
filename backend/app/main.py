@@ -33,11 +33,13 @@ except Exception as e:
     print(f"Notice: Static upload directory initialization: {e}")
 
 
-# Include API Routers (No Admin Router)
-app.include_router(events.router, prefix=settings.API_V1_STR)
-app.include_router(registration.router, prefix=settings.API_V1_STR)
-app.include_router(payment.router, prefix=settings.API_V1_STR)
-app.include_router(receipt.router, prefix=settings.API_V1_STR)
+# Include API Routers across prefixes for Vercel rewrite compatibility
+for pfx in [settings.API_V1_STR, "/v1", ""]:
+    app.include_router(events.router, prefix=pfx)
+    app.include_router(registration.router, prefix=pfx)
+    app.include_router(payment.router, prefix=pfx)
+    app.include_router(receipt.router, prefix=pfx)
+
 
 @app.get("/")
 @app.get("/api/v1/health")
