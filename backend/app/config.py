@@ -6,6 +6,11 @@ from dotenv import load_dotenv
 env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
 load_dotenv(env_path)
 
+DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbzHsjuh3_OhNxIf0uOAJJwyU4K5aU8o48GSyOUMymzc80Lpt2zQ-AJ--caAPSHEWLEhYw/exec"
+gas_url_env = os.getenv("GOOGLE_APPS_SCRIPT_URL", "").strip()
+if not gas_url_env or not gas_url_env.startswith("http") or "YOUR_" in gas_url_env:
+    gas_url_env = DEFAULT_GAS_URL
+
 try:
     from pydantic_settings import BaseSettings, SettingsConfigDict
     class Settings(BaseSettings):
@@ -18,10 +23,7 @@ try:
         ADMIN_USERNAME: str = os.getenv("ADMIN_USERNAME", "admin")
         ADMIN_PASSWORD: str = os.getenv("ADMIN_PASSWORD", "psvaids2026password")
 
-        GOOGLE_APPS_SCRIPT_URL: Optional[str] = os.getenv(
-            "GOOGLE_APPS_SCRIPT_URL",
-            "https://script.google.com/macros/s/AKfycbzHsjuh3_OhNxIf0uOAJJwyU4K5aU8o48GSyOUMymzc80Lpt2zQ-AJ--caAPSHEWLEhYw/exec"
-        )
+        GOOGLE_APPS_SCRIPT_URL: str = gas_url_env
 
         PAYMENT_MODE: str = os.getenv("PAYMENT_MODE", "PLACEHOLDER")
         CASHFREE_APP_ID: str = os.getenv("CASHFREE_APP_ID", "placeholder_app_id")
@@ -32,8 +34,8 @@ try:
 
     settings = Settings()
 
-except ImportError:
-    # Fallback to standard os.getenv if pydantic-settings is not installed yet
+except Exception as e:
+    # Fallback to standard os.getenv if pydantic-settings instantiation encounters any issue
     class FallbackSettings:
         PROJECT_NAME: str = os.getenv("PROJECT_NAME", "P.S.V College AI & DS Symposium 2026 API")
         API_V1_STR: str = os.getenv("API_V1_STR", "/api/v1")
@@ -44,10 +46,7 @@ except ImportError:
         ADMIN_USERNAME: str = os.getenv("ADMIN_USERNAME", "admin")
         ADMIN_PASSWORD: str = os.getenv("ADMIN_PASSWORD", "psvaids2026password")
 
-        GOOGLE_APPS_SCRIPT_URL: str = os.getenv(
-            "GOOGLE_APPS_SCRIPT_URL",
-            "https://script.google.com/macros/s/AKfycbzHsjuh3_OhNxIf0uOAJJwyU4K5aU8o48GSyOUMymzc80Lpt2zQ-AJ--caAPSHEWLEhYw/exec"
-        )
+        GOOGLE_APPS_SCRIPT_URL: str = gas_url_env
 
         PAYMENT_MODE: str = os.getenv("PAYMENT_MODE", "PLACEHOLDER")
         CASHFREE_APP_ID: str = os.getenv("CASHFREE_APP_ID", "placeholder_app_id")
@@ -55,3 +54,4 @@ except ImportError:
         CASHFREE_ENV: str = os.getenv("CASHFREE_ENV", "TEST")
 
     settings = FallbackSettings()
+
